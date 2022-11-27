@@ -1,0 +1,28 @@
+==6021== Memcheck, a memory error detector
+==6021== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==6021== Using Valgrind-3.15.0 and LibVEX; rerun with -h for copyright info
+==6021== Command: ./AsciiArtTool -i ../InOutFiles//test120.in ../InOutFiles//test120v.out
+==6021== Parent PID: 4972
+==6021== 
+==6021== 
+==6021== Process terminating with default action of signal 2 (SIGINT)
+==6021==    at 0x400AB1: RLEListSize (in /home/alfurman/MATAM/matam1/ToolTests/Script/AsciiArtTool)
+==6021==    by 0x4009E4: RLEListAppend (in /home/alfurman/MATAM/matam1/ToolTests/Script/AsciiArtTool)
+==6021==    by 0x40107B: asciiArtRead (in /home/alfurman/MATAM/matam1/ToolTests/Script/AsciiArtTool)
+==6021==    by 0x4012F4: main (in /home/alfurman/MATAM/matam1/ToolTests/Script/AsciiArtTool)
+==6021== 
+==6021== HEAP SUMMARY:
+==6021==     in use at exit: 85,600 bytes in 5,281 blocks
+==6021==   total heap usage: 5,281 allocs, 0 frees, 85,600 bytes allocated
+==6021== 
+==6021== LEAK SUMMARY:
+==6021==    definitely lost: 0 bytes in 0 blocks
+==6021==    indirectly lost: 0 bytes in 0 blocks
+==6021==      possibly lost: 0 bytes in 0 blocks
+==6021==    still reachable: 85,600 bytes in 5,281 blocks
+==6021==         suppressed: 0 bytes in 0 blocks
+==6021== Reachable blocks (those to which a pointer was found) are not shown.
+==6021== To see them, rerun with: --leak-check=full --show-leak-kinds=all
+==6021== 
+==6021== For lists of detected and suppressed errors, rerun with: -s
+==6021== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)

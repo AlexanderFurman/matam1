@@ -1,0 +1,101 @@
+        -:    0:Source:AsciiArtTool.c
+        -:    0:Programs:3
+        -:    1://
+        -:    2:// Created by Omer Meushar on 26/11/2022.
+        -:    3://
+        -:    4:
+        -:    5:#include "AsciiArtTool.h"
+        -:    6:#include <stdio.h>
+        -:    7:#include <assert.h>
+        -:    8:#include <stdlib.h>
+        -:    9:#define INVERTED_CHAR '@'
+        -:   10:#define INVERTED_SPACE ' '
+        -:   11:#define NULL_CHAR '\0'
+        -:   12:
+        -:   13:/*** Static Functions Declarations ***/
+        -:   14:///are there static funcs?
+        -:   15:
+        -:   16:/*** Function Implement ***/
+      396:   17:RLEList asciiArtRead(FILE* in_stream)
+        -:   18:{
+        -:   19://    if(in_stream == NULL){
+        -:   20://        return RLE_LIST_NULL_ARGUMENT;
+        -:   21://    }
+      396:   22:    assert(in_stream);
+        -:   23:    /// do we use our main in submit?? if not - change to if in comments
+      396:   24:    RLEList list = RLEListCreate();
+        -:   25:    char currentChar;
+        -:   26://    int currentResult = fscanf(in_stream, "%c", &currentChar);
+      396:   27:    while(fscanf(in_stream, "%c", &currentChar) && !feof(in_stream))
+        -:   28:    {
+ 92882442:   29:        if(RLEListAppend(list, currentChar) != RLE_LIST_SUCCESS){
+    #####:   30:            return NULL;
+        -:   31:        }
+ 92882442:   32:        if(currentChar == NULL_CHAR){
+    #####:   33:            return list;
+        -:   34:        }
+        -:   35:    }
+      396:   36:    return list;
+        -:   37:}
+        -:   38:
+      198:   39:RLEListResult asciiArtPrint(RLEList list, FILE *out_stream)
+        -:   40:{
+        -:   41:
+        -:   42:    //int string_length = getRLEStringLength();
+        -:   43:    // RLEListSize
+      198:   44:    int listSize = RLEListSize(list);
+        -:   45:    RLEListResult currentResult;
+ 46441419:   46:    for (int i = 0; i < listSize; ++i) {
+ 46441221:   47:        if(!(fprintf(out_stream, "%c", RLEListGet(list,i,&currentResult)))) {
+    #####:   48:            RLEListDestroy(list); /// omer final checks 27/11
+    #####:   49:            return RLE_LIST_NULL_ARGUMENT;
+        -:   50:        }
+ 46441221:   51:        assert(currentResult==RLE_LIST_SUCCESS);
+        -:   52:    }
+      198:   53:    RLEListDestroy(list); /// omer final checks 27/11
+      198:   54:    return RLE_LIST_SUCCESS;
+        -:   55:}
+        -:   56:
+      198:   57:RLEListResult asciiArtPrintEncoded(RLEList list, FILE *out_stream)
+        -:   58:{
+      198:   59:    if (!out_stream && list) {
+    #####:   60:        RLEListDestroy(list); /// omer final checks 27/11
+    #####:   61:        return RLE_LIST_NULL_ARGUMENT;
+        -:   62:    }
+      198:   63:    else if(!list) {
+    #####:   64:        return RLE_LIST_NULL_ARGUMENT;
+        -:   65:    }
+        -:   66:    //assert(out_stream);
+        -:   67:    RLEListResult result;
+      198:   68:    char* string = RLEListExportToString(list, &result);
+      198:   69:    if(result == RLE_LIST_SUCCESS){
+      198:   70:        if(fputs(string, out_stream) == EOF) {
+    #####:   71:            RLEListDestroy(list); /// omer final checks 27/11
+    #####:   72:            return RLE_LIST_NULL_ARGUMENT;
+        -:   73:        }
+        -:   74:    }
+      198:   75:    free(string);
+      198:   76:    RLEListDestroy(list); /// omer final checks 27/11
+      198:   77:    return result;
+        -:   78:}
+        -:   79:
+        -:   80:
+    12250:   81:static char invertedMapFunc(char c)
+        -:   82:{
+    12250:   83:    if (c == INVERTED_CHAR) {
+      273:   84:        c = INVERTED_SPACE;
+        -:   85:    }
+    11977:   86:    else if (c == INVERTED_SPACE) {
+      998:   87:        c = INVERTED_CHAR;
+        -:   88:    }
+    12250:   89:    return c;
+        -:   90:}
+        -:   91:
+      198:   92:void invertRLEList (RLEList list)
+        -:   93:{
+      198:   94:    RLEListMap(list, invertedMapFunc);
+      198:   95:}
+        -:   96:
+        -:   97:
+        -:   98:
+        -:   99:

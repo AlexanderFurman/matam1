@@ -1,0 +1,366 @@
+        -:    0:Source:RLEList.c
+        -:    0:Programs:3
+        -:    1:#include "RLEList.h"
+        -:    2:#include <stdio.h>
+        -:    3:#include <stdlib.h>
+        -:    4:#include <assert.h>
+        -:    5:#include <string.h>
+        -:    6:
+        -:    7:#define RLE_LIST_NULL -1
+        -:    8:#define NULL_CHAR '\0'
+        -:    9:#define EXPORT_TO_STRING_ROW_SIZE 3
+        -:   10:#define NUM_BASE 10
+        -:   11:#define LETTER_AND_NEWLINE_LENGTH 2
+        -:   12:#define LINE_FINISH '\n'
+        -:   13://#define EXPORT_TO_STRING_LETTER_ID 0
+        -:   14://#define EXPORT_TO_STRING_REPETITIONS_ID 1
+        -:   15://#define EXPORT_TO_STRING_LINE_ID 2
+        -:   16:
+        -:   17:
+        -:   18:typedef struct RLENode_t {
+        -:   19:    char letter;
+        -:   20:    int repetitions;
+        -:   21:    struct RLENode_t* next;
+        -:   22:} *RLENode;
+        -:   23:
+        -:   24:struct RLEList_t{
+        -:   25:    //TODO: implement
+        -:   26:    RLENode first;
+        -:   27:    RLENode last;
+        -:   28:    //int size
+        -:   29:    //numLetters
+        -:   30:};
+        -:   31:
+        -:   32:/***
+        -:   33: * typedef enum {
+        -:   34:    RLE_LIST_SUCCESS,
+        -:   35:    RLE_LIST_OUT_OF_MEMORY,
+        -:   36:    RLE_LIST_NULL_ARGUMENT,
+        -:   37:    RLE_LIST_INDEX_OUT_OF_BOUNDS,
+        -:   38:    RLE_LIST_ERROR
+        -:   39:} RLEListResult;
+        -:   40: */
+        -:   41:
+        -:   42:
+        -:   43:/*** Function Implement ***/
+        -:   44://implement the functions here
+        -:   45:
+        -:   46:static RLENode RLEListGetNodeFromIndex(RLEList list, int index, RLEListResult *result);
+        -:   47://static int listLengthNodes (RLEList list);
+        -:   48:static int getNumDigits (int intNum);
+        -:   49:static int getRLEStringLength (RLEList list);
+        -:   50://static void RLEPrint(RLEList list);
+        -:   51:
+        -:   52:
+        -:   53://static void RLEPrint(RLEList list)
+        -:   54://{
+        -:   55://    RLENode temp = list->first;
+        -:   56://    while (temp->next)
+        -:   57://    {
+        -:   58://        printf("%c%d ", temp->letter, temp->repetitions);
+        -:   59://        temp = temp->next;
+        -:   60://    }
+        -:   61://    printf("\n");
+        -:   62://
+        -:   63://}
+        -:   64:
+        -:   65://static int listLengthNodes (RLEList list)
+        -:   66://{
+        -:   67://    assert(list);
+        -:   68://    int counter = 0;
+        -:   69://    RLENode temp = list->first;
+        -:   70://    while (temp->next)
+        -:   71://    {
+        -:   72://        counter++;
+        -:   73://        temp = temp->next;
+        -:   74://    }
+        -:   75://    return counter;
+        -:   76://}
+        -:   77:
+      396:   78:RLEList RLEListCreate()
+        -:   79:{
+      396:   80:    RLEList linkedList = malloc(sizeof(*linkedList));
+      396:   81:    if (!linkedList) {
+    #####:   82:        return NULL;
+        -:   83:    }
+      396:   84:    linkedList->first = malloc(sizeof(*(linkedList->first)));
+      396:   85:    if (!linkedList->first) {
+    #####:   86:        free(linkedList);
+    #####:   87:        return NULL;
+        -:   88:    }
+      396:   89:    linkedList->first->next = NULL;
+      396:   90:    linkedList->first->repetitions = 0;
+      396:   91:    linkedList->first->letter= NULL_CHAR ;
+      396:   92:    linkedList->last = linkedList->first;
+        -:   93:
+      396:   94:    return linkedList;
+        -:   95:}
+        -:   96:
+      396:   97:void RLEListDestroy(RLEList list)
+        -:   98:{
+      396:   99:    if (!list){
+      396:  100:        return;
+        -:  101:    }
+      396:  102:    RLENode toDelete = NULL;
+    25292:  103:    while (list->first->next)
+        -:  104:    {
+    24500:  105:        assert(RLEListSize(list)>=0);
+    24500:  106:        toDelete=list->first->next;
+    24500:  107:        list->first->next = toDelete->next;
+    24500:  108:        free(toDelete);
+        -:  109:    }
+      396:  110:    free(list->first);
+      396:  111:    free(list);
+        -:  112:}
+        -:  113:
+ 92882442:  114:RLEListResult RLEListAppend(RLEList list, char value)
+        -:  115:{
+ 92882442:  116:    if(list == NULL) {
+    #####:  117:        return RLE_LIST_NULL_ARGUMENT;
+        -:  118:    }
+        -:  119:
+ 92882442:  120:    if(RLEListSize(list)==0 || list->last->letter != value )
+        -:  121:    {
+    24500:  122:        list->last->next = malloc(sizeof(*(list->last->next)));
+    24500:  123:        if (!list->last->next){
+    #####:  124:            return RLE_LIST_OUT_OF_MEMORY;
+        -:  125:        }
+        -:  126:
+    24500:  127:        list->last = list->last->next;
+    24500:  128:        list->last->letter = value;
+    24500:  129:        list->last->repetitions = 1;
+    24500:  130:        list->last->next = NULL;
+        -:  131:    }
+        -:  132:    else { //(list->last->letter == value)
+ 92857942:  133:        list->last->repetitions++;
+        -:  134:    }
+ 92882442:  135:    return RLE_LIST_SUCCESS;
+        -:  136:}
+        -:  137:
+139348559:  138:int RLEListSize(RLEList list)
+        -:  139:{
+139348559:  140:    if (!list) {
+    #####:  141:        return RLE_LIST_NULL;
+        -:  142:    }
+139348559:  143:    int counter = 0;
+139348559:  144:    RLENode temp = list->first;
+6320447711:  145:    while (temp->next)
+        -:  146:    {
+6041750593:  147:        counter += temp->next->repetitions;
+6041750593:  148:        temp = temp->next;
+        -:  149:    }
+        -:  150:    //counter+=list->last->repetitions;
+139348559:  151:    return counter;
+        -:  152:}
+        -:  153:
+        -:  154:
+        -:  155:
+        -:  156:///https://piazza.com/class/l8vdfbb5pf86qf/post/116
+        -:  157:// typedef char (*MapFunction)(char);
+      198:  158:RLEListResult RLEListMap(RLEList list, MapFunction map_function)
+        -:  159:{
+      198:  160:    if (!list || !map_function){
+    #####:  161:        return RLE_LIST_NULL_ARGUMENT;
+        -:  162:    }
+      198:  163:    if (RLEListSize(list) == 0) {
+        1:  164:        return RLE_LIST_SUCCESS;
+        -:  165:    }
+      197:  166:    RLENode temp = list->first->next;
+      197:  167:    temp->letter = map_function(temp->letter);
+    12447:  168:    while (temp->next)
+        -:  169:    {
+    12053:  170:        temp->next->letter = map_function(temp->next->letter);
+    12053:  171:        if(temp->letter == temp->next->letter) {
+    #####:  172:            temp->repetitions += temp->next->repetitions;
+    #####:  173:            RLENode next = temp->next;
+    #####:  174:            temp->next = temp->next->next;
+    #####:  175:            free(next);
+        -:  176:        }
+        -:  177:        else {
+    12053:  178:            temp=temp->next;
+        -:  179:        }
+        -:  180:    }
+      197:  181:    return RLE_LIST_SUCCESS;
+        -:  182:}
+        -:  183:
+      198:  184:char* RLEListExportToString(RLEList list, RLEListResult* result)
+        -:  185:{
+        -:  186://    if (!result) {
+        -:  187://        return NULL;
+        -:  188://    }
+      198:  189:    if (!list) {
+    #####:  190:        if(result){
+    #####:  191:            *result=RLE_LIST_NULL_ARGUMENT;
+        -:  192:        }
+    #####:  193:        return NULL;
+        -:  194:    }
+        -:  195:    // size of new string: 3 letters in row (including \n), times num of rows, +1 for null terminated string
+      198:  196:    char* outString = malloc(getRLEStringLength(list)*sizeof(char));
+      198:  197:    if (!outString) {
+    #####:  198:        if(result) {
+    #####:  199:            *result=RLE_LIST_OUT_OF_MEMORY;
+        -:  200:        }
+    #####:  201:        return NULL;
+        -:  202:    }
+      198:  203:    *outString = NULL_CHAR;
+        -:  204:
+      198:  205:    RLENode temp = list->first;
+    12646:  206:    while (temp->next)
+        -:  207:    {
+    12250:  208:        char *currentRow = malloc(sizeof(char)*(LETTER_AND_NEWLINE_LENGTH +1 + getNumDigits(temp->next->repetitions)+1));
+    12250:  209:        sprintf(currentRow, "%c%d\n", temp->next->letter, temp->next->repetitions);
+    12250:  210:        strcat(outString, currentRow);
+    12250:  211:        free(currentRow);
+    12250:  212:        temp=temp->next;
+        -:  213:    }
+      198:  214:    if(result){
+      198:  215:        *result = RLE_LIST_SUCCESS;
+        -:  216:    }
+      198:  217:    return outString;
+        -:  218:}
+        -:  219:
+    #####:  220:RLEListResult RLEListRemove(RLEList list, int index){
+        -:  221:
+        -:  222:    RLEListResult result;
+    #####:  223:    RLENode prevNode = RLEListGetNodeFromIndex(list, index, &result);
+    #####:  224:    if (prevNode == NULL){
+    #####:  225:        return result;
+        -:  226:    }
+        -:  227:
+    #####:  228:    RLENode node = prevNode->next;
+        -:  229:
+        -:  230:    /// for debug - we should desired node by here:
+        -:  231:
+        -:  232:    // Deal with case where repetitions > 1 (simple case)
+    #####:  233:    if(node->repetitions > 1){
+    #####:  234:        node->repetitions--;
+    #####:  235:        return RLE_LIST_SUCCESS;
+        -:  236:    }
+        -:  237:        // Deal with case where repetitions == 1
+        -:  238:    else{
+        -:  239:        // Deal with last node remove:
+    #####:  240:        if(node->next == NULL) {
+    #####:  241:            prevNode->next = NULL;
+    #####:  242:            list->last=prevNode;
+        -:  243:        }
+        -:  244:        // Deal with first node remove (after dummy):
+        -:  245://        else if()
+        -:  246://        {
+        -:  247://            prevNode->next = node->next;
+        -:  248://        }
+        -:  249:            // Deal with the case where the previous node and next node have different letters:
+    #####:  250:        else if(list->first == prevNode || prevNode->letter != node->next->letter) { ///united above condition
+    #####:  251:            prevNode->next = node->next;
+        -:  252:        }
+        -:  253:            // Deal with case where the previous node and next node have SAME letter:
+        -:  254:        else{
+    #####:  255:            prevNode->repetitions += node->next->repetitions;
+    #####:  256:            prevNode->next = node->next->next;
+    #####:  257:            if(list->last==node->next) {
+    #####:  258:                list->last = prevNode;
+        -:  259:            }
+    #####:  260:            free(node->next);
+        -:  261:        }
+    #####:  262:        free(node);
+    #####:  263:        return RLE_LIST_SUCCESS;
+        -:  264:    }
+        -:  265:    // return RLE_LIST_ERROR;
+        -:  266:}
+        -:  267:
+        -:  268://void uniteNodes(RLEList list, RLENode prevNode, RLENode node){
+        -:  269://    assert(node->next);
+        -:  270://    prevNode->repetitions += node->next->repetitions;
+        -:  271://    prevNode->next = node->next->next;
+        -:  272://    if(list->last==node->next) {
+        -:  273://        list->last = prevNode;
+        -:  274://    }
+        -:  275://    free(node->next);
+        -:  276://}
+        -:  277:
+ 46441221:  278:char RLEListGet(RLEList list, int index, RLEListResult *result)
+        -:  279:{
+ 46441221:  280:    RLENode prevNode = RLEListGetNodeFromIndex(list, index, result);
+ 46441221:  281:    if (prevNode == NULL){
+    #####:  282:        return 0;
+        -:  283:    }
+        -:  284:    else{
+ 46441221:  285:        return prevNode->next->letter;
+        -:  286:    }
+        -:  287:    
+        -:  288:    // if (!list) {
+        -:  289:    //     return RLE_LIST_NULL_ARGUMENT;
+        -:  290:    // }
+        -:  291:    // if(index < 0 || index + 1 > RLEListSize(list)) { // CHECK THIS +1 is correct??
+        -:  292:    //     return RLE_LIST_INDEX_OUT_OF_BOUNDS;
+        -:  293:    // }
+        -:  294:
+        -:  295:    // RLENode node = list->first->next;
+        -:  296:    // int indicesRemaining = index;
+        -:  297:
+        -:  298:    // while(indicesRemaining >= node->repetitions){
+        -:  299:    //     indicesRemaining -= node->repetitions;
+        -:  300:    //     node = node->next;
+        -:  301:    // }
+        -:  302:
+        -:  303:    // *result = RLE_LIST_SUCCESS;
+        -:  304:    // return node->letter;
+        -:  305:}
+        -:  306:
+ 46441221:  307:static RLENode RLEListGetNodeFromIndex(RLEList list, int index, RLEListResult *result){
+ 46441221:  308:    if (!list) {
+    #####:  309:        if (result){
+    #####:  310:            *result = RLE_LIST_NULL_ARGUMENT;
+        -:  311:        }
+        -:  312:
+    #####:  313:        return NULL;
+        -:  314:    }
+ 46441221:  315:    if(index < 0 || index + 1 > RLEListSize(list)) { /// +1 should be correct
+    #####:  316:    if(result){
+    #####:  317:        *result = RLE_LIST_INDEX_OUT_OF_BOUNDS;
+        -:  318:    }
+    #####:  319:        return NULL;
+        -:  320:    }
+        -:  321:    // int current_idx = 0;
+ 46441221:  322:    RLENode prevNode = list->first;
+ 46441221:  323:    RLENode node = prevNode->next;
+ 46441221:  324:    int indicesRemaining = index;
+        -:  325:
+        -:  326:    // First move to the correct node, and previous node
+1568540610:  327:    while(indicesRemaining >= node->repetitions){
+1475658168:  328:        indicesRemaining -= node->repetitions;
+1475658168:  329:        prevNode = node;
+1475658168:  330:        node = prevNode->next;
+        -:  331:    }
+ 46441221:  332:    if(result){
+ 46441221:  333:        *result = RLE_LIST_SUCCESS;
+        -:  334:    }
+ 46441221:  335:    return prevNode;
+        -:  336:}
+    24500:  337:static int getNumDigits (int intNum) {
+    24500:  338:    int counter = 0;
+    24500:  339:    if (intNum == 0) {
+    #####:  340:        return 1;
+        -:  341:    }
+   123686:  342:    while (intNum!=0) {
+    74686:  343:        intNum/=NUM_BASE;
+    74686:  344:        counter++;
+        -:  345:    }
+    24500:  346:    return counter;
+        -:  347:}
+        -:  348:
+      198:  349:static int getRLEStringLength (RLEList list) {
+      198:  350:    assert(list);
+        -:  351://    if (listLengthNodes(list)==0) {
+        -:  352://        return 1;
+        -:  353://    }
+      198:  354:    int lenCounter = 1; ///NULL terminated in case of empty list;
+      198:  355:    RLENode temp = list->first;
+    12646:  356:    while (temp->next)
+        -:  357:    {
+    12250:  358:        lenCounter += LETTER_AND_NEWLINE_LENGTH;
+    12250:  359:        lenCounter += (getNumDigits(temp->next->repetitions));
+    12250:  360:        temp=temp->next;
+        -:  361:    }
+      198:  362:    return lenCounter;
+        -:  363:}
+        -:  364:
